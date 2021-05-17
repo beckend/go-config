@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestPkgAnagram(t *testing.T) {
+func TestPkg(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "pkg common Suite")
 }

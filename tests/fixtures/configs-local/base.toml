@@ -1,2 +1,2 @@
 RunEnv = 'development'
-AccessKey = 'AccessKey'
+AccessKey = "${SHELL}"

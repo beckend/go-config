@@ -11,24 +11,13 @@ import (
 // ValidatorUtilsValidateStructOptions options for ValidatorUtils.validateStruct
 type ValidatorUtilsValidateStructOptions struct {
 	PrefixError  string
-	Validate     *validator.Validate
 	TheStruct    interface{}
 	PanicOnError bool
 }
 
-// ValidatorUtils utils for the main return
-type ValidatorUtils interface {
-	ValidateStruct(x ValidatorUtilsValidateStructOptions) *validator.ValidationErrors
-}
-
-// ValidatorUtilsInstance implements ValidatorUtils
-type ValidatorUtilsInstance struct {
-	ValidatorUtils
-}
-
 // ValidateStruct implementation of ValidatorUtils.ValidateStruct
-func (x ValidatorUtilsInstance) ValidateStruct(options ValidatorUtilsValidateStructOptions) *validator.ValidationErrors {
-	errs := options.Validate.Struct(options.TheStruct)
+func (instance Validator) ValidateStruct(options ValidatorUtilsValidateStructOptions) *validator.ValidationErrors {
+	errs := instance.Validate.Struct(options.TheStruct)
 
 	if errs != nil {
 		errsValidation := errs.(validator.ValidationErrors)
@@ -71,16 +60,14 @@ func (x ValidatorUtilsInstance) ValidateStruct(options ValidatorUtilsValidateStr
 	return nil
 }
 
-// GetValidatorReturn returned from GetValidator
-type GetValidatorReturn struct {
+// Validator returned from New
+type Validator struct {
 	Validate *validator.Validate
-	Utils    *ValidatorUtilsInstance
 }
 
-// GetValidator validation library for the app
-func GetValidator() GetValidatorReturn {
-	return GetValidatorReturn{
+// New validation library for the app
+func New() Validator {
+	return Validator{
 		Validate: validator.New(),
-		Utils:    &ValidatorUtilsInstance{},
 	}
 }

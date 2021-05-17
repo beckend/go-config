@@ -12,6 +12,7 @@ go get -u github.com/beckend/go-config
 - the directory of files with be parsed in order: `base.toml` -> `[env].toml` -> `local.toml` and the later one will overwrite the values of the previous, all files are optionally existing.
 - `[env].toml` is calulated by providing in options struct with key `EnvKeyRunEnv`, so set for example to `RUN_ENV` it will read environment variable `RUN_ENV` and if the value is for example `staging` it becomes `staging.toml`.
 - the config structs which are to be validated can be annotated correctly according to https://github.com/go-playground/validator - which is being used in this library.
+- the contents of the config file have a lot of features, including environment variable substitution, check out https://github.com/gookit/config
 
 Example:
 

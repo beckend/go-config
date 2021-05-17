@@ -3,8 +3,8 @@ package configuration_test
 import (
 	os "os"
 	path "path"
+	filepath "path/filepath"
 	runtime "runtime"
-	testing "testing"
 
 	configuration "github.com/beckend/go-config"
 
@@ -22,20 +22,30 @@ type TestValidateStructOneFail struct {
 	RunEnV     string `validate:"required"`
 }
 
-func TestPkgAnagram(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "configuration Suite")
-}
-
-var _ = Describe("configuration", func() {
+var _ = Describe("pkg validation", func() {
 	_, pathCurrentFile, _, _ := runtime.Caller(0)
-	pathFixtures := path.Join(pathCurrentFile, "../fixtures")
+	pathDirCurrent, _ := filepath.Split(pathCurrentFile)
+	pathFixtures := path.Join(pathDirCurrent, "tests/fixtures")
 
-	Context("GetConfig", func() {
+	Context("GetEnv", func() {
+		When("env exists", func() {
+			It("returns correct value", func() {
+				Expect(len(configuration.GetEnv("SHELL", "")) > 0).To(Equal(true))
+			})
+		})
+
+		When("env does not exist", func() {
+			It("returns fallback", func() {
+				Expect(configuration.GetEnv("FDSCCVB##csdas#@!CS", "")).To(Equal(""))
+			})
+		})
+	})
+
+	Context("New", func() {
 		When("only base.toml is present", func() {
 			It("values are set", func() {
-				result := configuration.GetConfig(configuration.GetConfigOptions{
-					CreateConfig: func(options configuration.CallbackGetConfigOptions) interface{} {
+				result := configuration.New(configuration.NewOptions{
+					CreateConfig: func(options configuration.CallbackNewOptions) interface{} {
 						returned := TestValidateStructOne{}
 
 						options.FailOnError(options.Config.BindStruct("", &returned))
@@ -53,8 +63,8 @@ var _ = Describe("configuration", func() {
 
 			It("panics upon validation failure", func() {
 				Expect(func() {
-					configuration.GetConfig(configuration.GetConfigOptions{
-						CreateConfig: func(options configuration.CallbackGetConfigOptions) interface{} {
+					configuration.New(configuration.NewOptions{
+						CreateConfig: func(options configuration.CallbackNewOptions) interface{} {
 							returned := TestValidateStructOneFail{}
 
 							options.FailOnError(options.Config.BindStruct("", &returned))
@@ -76,8 +86,8 @@ var _ = Describe("configuration", func() {
 				os.Setenv(keyEnvTarget, keyEnvTargetValue)
 				defer os.Unsetenv(keyEnvTarget)
 
-				result := configuration.GetConfig(configuration.GetConfigOptions{
-					CreateConfig: func(options configuration.CallbackGetConfigOptions) interface{} {
+				result := configuration.New(configuration.NewOptions{
+					CreateConfig: func(options configuration.CallbackNewOptions) interface{} {
 						returned := TestValidateStructOne{}
 
 						options.FailOnError(options.Config.BindStruct("", &returned))
@@ -95,12 +105,14 @@ var _ = Describe("configuration", func() {
 
 		When("base.toml is present, env.toml is present, local.toml is present, and using default EnKeyRunEnv", func() {
 			It("local.toml has the last word.", func() {
-				result := configuration.GetConfig(configuration.GetConfigOptions{
-					CreateConfig: func(options configuration.CallbackGetConfigOptions) interface{} {
+				result := configuration.New(configuration.NewOptions{
+					CreateConfig: func(options configuration.CallbackNewOptions) interface{} {
 						returned := TestValidateStructOne{}
 
 						options.FailOnError(options.Config.BindStruct("", &returned))
 						options.Validate(returned)
+
+						options.LogSpew(returned)
 
 						return returned
 					},

@@ -8,7 +8,7 @@ import (
 
 // Singletons for the whole app
 type Singletons struct {
-	Validation validation.GetValidatorReturn
+	Validation validation.Validator
 }
 
 var (
@@ -16,11 +16,11 @@ var (
 	doOnce   sync.Once
 )
 
-// GetSingletons returns struct Singletons
-func GetSingletons() *Singletons {
+// New returns struct Singletons
+func New() *Singletons {
 	doOnce.Do(func() {
 		instance = &Singletons{}
-		instance.Validation = validation.GetValidator()
+		instance.Validation = validation.New()
 	})
 
 	return instance

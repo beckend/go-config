@@ -16,8 +16,8 @@ import (
 	conditional "github.com/mileusna/conditional"
 )
 
-// CallbackGetConfigOptions callback options
-type CallbackGetConfigOptions struct {
+// CallbackNewOptions callback options
+type CallbackNewOptions struct {
 	Singletons  singletons.Singletons
 	Config      config.Config
 	FailOnError common.FailOnErrorFunc
@@ -25,8 +25,8 @@ type CallbackGetConfigOptions struct {
 	Validate    CallbackValidate
 }
 
-// GetConfigOptions GetConfig options
-type GetConfigOptions struct {
+// NewOptions GetConfig options
+type NewOptions struct {
 	CreateConfig CallbackGetConfig
 	EnvKeyRunEnv string
 	PathConfigs  string
@@ -41,11 +41,12 @@ func GetEnv(key string, fallback string) string {
 	return fallback
 }
 
-// GetConfig read configurations with priority, checking if the files exists or not
-func GetConfig(options GetConfigOptions) interface{} {
+// New read configurations with priority, checking if the files exists or not
+func New(options NewOptions) interface{} {
 	instanceConfig := config.NewEmpty("main-configuration")
-	instanceConfig.WithOptions(config.ParseEnv)
 	instanceConfig.AddDriver(toml.Driver)
+	instanceConfig.WithOptions(config.ParseEnv)
+
 	_, envKeyUserExists := os.LookupEnv(options.EnvKeyRunEnv)
 	envRun := GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), "development")
 
@@ -60,9 +61,9 @@ func GetConfig(options GetConfigOptions) interface{} {
 		}
 	}
 
-	singletonsInstance := singletons.GetSingletons()
+	singletonsInstance := singletons.New()
 
-	return options.CreateConfig(CallbackGetConfigOptions{
+	return options.CreateConfig(CallbackNewOptions{
 		Singletons: *singletonsInstance,
 
 		Config: *instanceConfig,
@@ -77,9 +78,8 @@ func GetConfig(options GetConfigOptions) interface{} {
 		},
 
 		Validate: func(x interface{}) {
-			singletonsInstance.Validation.Utils.ValidateStruct(validation.ValidatorUtilsValidateStructOptions{
+			singletonsInstance.Validation.ValidateStruct(validation.ValidatorUtilsValidateStructOptions{
 				PrefixError:  "Environment variable error - ",
-				Validate:     singletonsInstance.Validation.Validate,
 				TheStruct:    x,
 				PanicOnError: true,
 			})
@@ -89,7 +89,7 @@ func GetConfig(options GetConfigOptions) interface{} {
 
 type (
 	// CallbackGetConfig type to be used in struct
-	CallbackGetConfig func(options CallbackGetConfigOptions) interface{}
+	CallbackGetConfig func(options CallbackNewOptions) interface{}
 	// CallbackGeneric type to be used in struct
 	CallbackGeneric func(x ...interface{})
 	// CallbackValidate type to be used in struct

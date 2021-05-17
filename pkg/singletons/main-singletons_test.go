@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestPkgAnagram(t *testing.T) {
+func TestPkg(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "pkg singletons Suite")
 }
@@ -18,7 +18,7 @@ var _ = Describe("pkg singletons", func() {
 	Context("GetSingletons", func() {
 		When("called", func() {
 			It("will not panic and value is set", func() {
-				result := singletons.GetSingletons()
+				result := singletons.New()
 				Expect(result.Validation).ToNot(BeNil())
 			})
 		})

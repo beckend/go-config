@@ -1,1 +1,2 @@
 ./configs/local.toml
+*.coverprofile
