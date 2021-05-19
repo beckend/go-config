@@ -27,7 +27,7 @@ type CallbackNewOptions struct {
 
 // NewOptions GetConfig options
 type NewOptions struct {
-	CreateConfig CallbackGetConfig
+	CreateConfig CallNewConfig
 	EnvKeyRunEnv string
 	PathConfigs  string
 }
@@ -88,8 +88,8 @@ func New(options NewOptions) interface{} {
 }
 
 type (
-	// CallbackGetConfig type to be used in struct
-	CallbackGetConfig func(options CallbackNewOptions) interface{}
+	// CallNewConfig type to be used in struct
+	CallNewConfig func(options CallbackNewOptions) interface{}
 	// CallbackGeneric type to be used in struct
 	CallbackGeneric func(x ...interface{})
 	// CallbackValidate type to be used in struct
