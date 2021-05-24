@@ -1,8 +1,12 @@
 SHELL := /bin/bash
-cwd := $(shell pwd)
+
+.PHONY: test test-watch coverage-examine
 
 test:
 	go test ./... -cover -coverprofile=coverage.coverprofile
+
+test-watch:
+	ginkgo watch -r -trace
 
 coverage-examine: test
 	go tool cover -html=coverage.coverprofile

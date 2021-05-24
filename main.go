@@ -1,54 +1,71 @@
-// Package configuration parsed toml files in specific order to generate a validated struct
-package configuration
+// Package config parsed toml files in specific order to generate a validated struct
+package config
 
 import (
+	errors "errors"
+	io "io"
 	os "os"
 	path "path"
+	reflect "reflect"
 
-	common "github.com/beckend/go-config/pkg/common"
+	environment "github.com/beckend/go-config/pkg/environment"
+	file "github.com/beckend/go-config/pkg/file"
 	singletons "github.com/beckend/go-config/pkg/singletons"
 	validation "github.com/beckend/go-config/pkg/validation"
+	walkertype "github.com/beckend/go-config/pkg/walker-type"
+	validator "github.com/go-playground/validator/v10"
+	envutil "github.com/gookit/goutil/envutil"
+	jsoniter "github.com/json-iterator/go"
 
-	spew "github.com/davecgh/go-spew/spew"
-	color "github.com/fatih/color"
-	config "github.com/gookit/config/v2"
-	toml "github.com/gookit/config/v2/toml"
 	conditional "github.com/mileusna/conditional"
+	mapstructure "github.com/mitchellh/mapstructure"
 )
 
-// CallbackNewOptions callback options
-type CallbackNewOptions struct {
-	Singletons  singletons.Singletons
-	Config      config.Config
-	FailOnError common.FailOnErrorFunc
-	LogSpew     CallbackGeneric
-	Validate    CallbackValidate
+var (
+	defaultRUNENV = "development"
+	json          = jsoniter.ConfigCompatibleWithStandardLibrary
+)
+
+type Config struct {
+	ErrorsValidation *validator.ValidationErrors
 }
 
-// NewOptions GetConfig options
+type OnConfigBeforeValidationOptions struct {
+	ConfigUnmarshal interface{}
+}
+
+type LoadConfigsOptionsTOML struct {
+	FileToJSON   func(string) ([]byte, error)
+	StringToJSON func(string) ([]byte, error)
+	BytesToJSON  func([]byte) ([]byte, error)
+	ReaderToJSON func(io.Reader) ([]byte, error)
+}
+
+type LoadConfigsOptions struct {
+	TOML *LoadConfigsOptionsTOML
+}
+
+type (
+	// Allows user to have a shot on the config before it validats
+	OnConfigBeforeValidation func(options *OnConfigBeforeValidationOptions) error
+	// Allow user to load configs, user has to return a []byte which has been through json.Marshal into []byte
+	// The payload is in the end going to be json.Unmarshaled
+	LoadConfigs func(options *LoadConfigsOptions) ([][]byte, error)
+)
+
 type NewOptions struct {
-	CreateConfig CallNewConfig
-	EnvKeyRunEnv string
-	PathConfigs  string
+	OnConfigBeforeValidation OnConfigBeforeValidation
+	LoadConfigs              LoadConfigs
+	EnvKeyRunEnv             string
+	PathConfigs              string
+	ConfigUnmarshal          interface{}
 }
 
-// GetEnv gets environment with fallback
-func GetEnv(key string, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-
-	return fallback
-}
-
-// New read configurations with priority, checking if the files exists or not
-func New(options NewOptions) interface{} {
-	instanceConfig := config.NewEmpty("main-configuration")
-	instanceConfig.AddDriver(toml.Driver)
-	instanceConfig.WithOptions(config.ParseEnv)
-
+// New read configurations with priority, the later overrides the previous
+func New(options *NewOptions) (*Config, error) {
 	_, envKeyUserExists := os.LookupEnv(options.EnvKeyRunEnv)
-	envRun := GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), "development")
+	envRun := environment.GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), defaultRUNENV)
+	var filesToBeMerged []string
 
 	for _, pathFile := range [...](string){
 		// the order to load is base, env specific, then local, where the next overrides the previous values
@@ -57,41 +74,82 @@ func New(options NewOptions) interface{} {
 		path.Join(options.PathConfigs, "local.toml"),
 	} {
 		if _, err := os.Stat(pathFile); err == nil {
-			common.FailOnError(instanceConfig.LoadFiles(pathFile))
+			filesToBeMerged = append(filesToBeMerged, pathFile)
 		}
 	}
 
-	singletonsInstance := singletons.New()
+	bytesJSONMerged, err := file.TOMLFilesToMergedJSON(filesToBeMerged)
+	if err != nil {
+		return nil, err
+	}
 
-	return options.CreateConfig(CallbackNewOptions{
-		Singletons: *singletonsInstance,
+	if options.LoadConfigs != nil {
+		byteSlicesUser, err := options.LoadConfigs(&LoadConfigsOptions{
+			TOML: &LoadConfigsOptionsTOML{
+				FileToJSON:   file.TOMLFileToJSON,
+				BytesToJSON:  file.TOMLBytesToJSON,
+				StringToJSON: file.TOMLStringToJSON,
+				ReaderToJSON: file.TOMLReaderToJSON,
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
 
-		Config: *instanceConfig,
+		// prepend bytesJSONMerged into byteSlicesUser so the user files overrides the initial config
+		byteSlicesUser = append([][]byte{bytesJSONMerged}, byteSlicesUser...)
+		bytesJSONMerged, err = file.TOMLBytesToMergedJSON(byteSlicesUser)
+		if err != nil {
+			return nil, err
+		}
+	}
 
-		FailOnError: common.FailOnError,
+	// convert to a generic map interface to replace env variables
+	var configMap walkertype.TypeMap
+	err = json.Unmarshal(bytesJSONMerged, &configMap)
+	if err != nil {
+		return nil, err
+	}
 
-		LogSpew: func(x ...interface{}) {
-			color.New(color.FgHiYellow).Println("Parsed environment variables:")
-			color.Set(color.FgHiBlue)
-			spew.Dump(x...)
-			color.Unset()
-		},
+	(&walkertype.Walker{}).WalkMap(configMap, func(options *walkertype.WalkerOnWalkMapOptions) *walkertype.WalkerReturn {
+		if options.Kind == reflect.String {
+			options.Document[options.Key] = envutil.ParseEnvValue(options.Value.(string))
 
-		Validate: func(x interface{}) {
-			singletonsInstance.Validation.ValidateStruct(validation.ValidatorUtilsValidateStructOptions{
-				PrefixError:  "Environment variable error - ",
-				TheStruct:    x,
-				PanicOnError: true,
-			})
-		},
+			return &walkertype.WalkerReturn{
+				Handled: true,
+			}
+		}
+
+		return &walkertype.WalkerReturn{
+			Handled: false,
+		}
 	})
-}
 
-type (
-	// CallNewConfig type to be used in struct
-	CallNewConfig func(options CallbackNewOptions) interface{}
-	// CallbackGeneric type to be used in struct
-	CallbackGeneric func(x ...interface{})
-	// CallbackValidate type to be used in struct
-	CallbackValidate func(interface{})
-)
+	mapstructure.Decode(configMap, &options.ConfigUnmarshal)
+
+	if options.OnConfigBeforeValidation != nil {
+		err = options.OnConfigBeforeValidation(&OnConfigBeforeValidationOptions{
+			ConfigUnmarshal: options.ConfigUnmarshal,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	errsValidation := singletons.New().Validation.ValidateStruct(validation.ValidatorUtilsValidateStructOptions{
+		PrefixError:  "Config struct validation error - ",
+		TheStruct:    options.ConfigUnmarshal,
+		PanicOnError: false,
+	})
+
+	if errsValidation != nil && len(*errsValidation) > 0 {
+		err = errors.New("config struct validation failed")
+	} else {
+		err = nil
+	}
+
+	return &Config{
+		ErrorsValidation: errsValidation,
+	}, err
+}

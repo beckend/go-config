@@ -1,2 +1,4 @@
 RunEnv = 'development'
-AccessKey = "${SHELL}"
+AccessKey = "accesskey"
+Password = "${____password___|defaultpassword}"
+Shell = "${SHELL}"
