@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"errors"
 	os "os"
 	path "path"
 	filepath "path/filepath"
@@ -52,6 +53,28 @@ var _ = Describe("pkg validation", func() {
 				}
 
 				Expect(result.Key1).To(Equal("AccessKey"))
+			})
+		})
+
+		When("RunEnv env is missing", func() {
+			It("string will be empty", func() {
+				var result TestValidateStructTwo
+				_, err := config.New(&config.NewOptions{
+					ConfigUnmarshal: &result,
+					PathConfigs:     path.Join(pathFixtures, "does/not-exist"),
+					OnConfigBeforeValidation: func(options *config.OnConfigBeforeValidationOptions) error {
+						cfg := options.ConfigUnmarshal.(*TestValidateStructTwo)
+						cfg.AccessKey = "somethings"
+
+						if cfg.RunEnV != "" {
+							return errors.New("this is not supposed to happen")
+						}
+
+						return nil
+					},
+				})
+
+				Expect(err.Error()).To(ContainSubstring("struct validation failed"))
 			})
 		})
 

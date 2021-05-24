@@ -21,10 +21,7 @@ import (
 	mapstructure "github.com/mitchellh/mapstructure"
 )
 
-var (
-	defaultRUNENV = "development"
-	json          = jsoniter.ConfigCompatibleWithStandardLibrary
-)
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Config struct {
 	ErrorsValidation *validator.ValidationErrors
@@ -65,15 +62,18 @@ type NewOptions struct {
 // New read configurations with priority, the later overrides the previous
 func New(options *NewOptions) (*Config, error) {
 	_, envKeyUserExists := os.LookupEnv(options.EnvKeyRunEnv)
-	envRun := environment.GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), defaultRUNENV)
+	envRun := environment.GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), "")
 	var filesToBeMerged []string
+	var filesToLoad []string
 
-	for _, pathFile := range [...](string){
-		// the order to load is base, env specific, then local, where the next overrides the previous values
-		path.Join(options.PathConfigs, "base.toml"),
-		path.Join(options.PathConfigs, envRun+".toml"),
-		path.Join(options.PathConfigs, "local.toml"),
-	} {
+	// the order to load is base, env specific, then local, where the next overrides the previous values
+	filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, "base.toml"))
+	if envRun != "" {
+		filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, envRun+".toml"))
+	}
+	filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, "local.toml"))
+
+	for _, pathFile := range filesToLoad {
 		if _, err := os.Stat(pathFile); err == nil {
 			filesToBeMerged = append(filesToBeMerged, pathFile)
 		}
