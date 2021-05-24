@@ -4,13 +4,10 @@ import (
 	testing "testing"
 
 	environment "github.com/beckend/go-config/pkg/environment"
-	jsoniter "github.com/json-iterator/go"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func TestPkg(t *testing.T) {
 	RegisterFailHandler(Fail)
