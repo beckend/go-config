@@ -2,9 +2,37 @@ package file
 
 import (
 	io "io"
+	fs "io/fs"
 
 	gotoml "github.com/pelletier/go-toml"
 )
+
+func TOMLFileReaderCallbackToJSON(getFileCallback func() (fs.File, error)) ([]byte, error) {
+	file, err := getFileCallback()
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	res, err := gotoml.LoadReader(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return JSONGenericMapToBytes(res.ToMap())
+}
+
+func TOMLFileReaderToJSON(input fs.File, doClose bool) ([]byte, error) {
+	res, err := gotoml.LoadReader(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if doClose {
+		defer input.Close()
+	}
+	return JSONGenericMapToBytes(res.ToMap())
+}
 
 func TOMLReaderToJSON(input io.Reader) ([]byte, error) {
 	res, err := gotoml.LoadReader(input)

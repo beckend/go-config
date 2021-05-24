@@ -4,6 +4,7 @@ package config
 import (
 	errors "errors"
 	io "io"
+	fs "io/fs"
 	os "os"
 	path "path"
 	reflect "reflect"
@@ -32,10 +33,12 @@ type OnConfigBeforeValidationOptions struct {
 }
 
 type LoadConfigsOptionsTOML struct {
-	FileToJSON   func(string) ([]byte, error)
-	StringToJSON func(string) ([]byte, error)
-	BytesToJSON  func([]byte) ([]byte, error)
-	ReaderToJSON func(io.Reader) ([]byte, error)
+	FileToJSON               func(string) ([]byte, error)
+	StringToJSON             func(string) ([]byte, error)
+	BytesToJSON              func([]byte) ([]byte, error)
+	ReaderToJSON             func(io.Reader) ([]byte, error)
+	FileReaderToJSON         func(file fs.File, closeFile bool) ([]byte, error)
+	FileReaderCallbackToJSON func(getFileCallback func() (fs.File, error)) ([]byte, error)
 }
 
 type LoadConfigsOptions struct {
@@ -87,10 +90,12 @@ func New(options *NewOptions) (*Config, error) {
 	if options.LoadConfigs != nil {
 		byteSlicesUser, err := options.LoadConfigs(&LoadConfigsOptions{
 			TOML: &LoadConfigsOptionsTOML{
-				FileToJSON:   file.TOMLFileToJSON,
-				BytesToJSON:  file.TOMLBytesToJSON,
-				StringToJSON: file.TOMLStringToJSON,
-				ReaderToJSON: file.TOMLReaderToJSON,
+				FileToJSON:               file.TOMLFileToJSON,
+				BytesToJSON:              file.TOMLBytesToJSON,
+				StringToJSON:             file.TOMLStringToJSON,
+				ReaderToJSON:             file.TOMLReaderToJSON,
+				FileReaderToJSON:         file.TOMLFileReaderToJSON,
+				FileReaderCallbackToJSON: file.TOMLFileReaderCallbackToJSON,
 			},
 			RunEnv: envRun,
 		})

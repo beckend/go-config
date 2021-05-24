@@ -2,16 +2,13 @@
 package file
 
 import (
-	ioutil "io/ioutil"
 	os "os"
 	filepath "path/filepath"
 
 	jsoniter "github.com/json-iterator/go"
 )
 
-var (
-	json = jsoniter.ConfigCompatibleWithStandardLibrary
-)
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type WriteFileOptions struct {
 	PathFile      string
@@ -24,7 +21,7 @@ func WriteFile(options *WriteFileOptions) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(options.PathFile, options.ContentsBytes, 0644)
+	err = os.WriteFile(options.PathFile, options.ContentsBytes, 0644)
 	if err != nil {
 		return err
 	}
