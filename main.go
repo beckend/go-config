@@ -42,7 +42,8 @@ type LoadConfigsOptionsTOML struct {
 }
 
 type LoadConfigsOptions struct {
-	TOML *LoadConfigsOptionsTOML
+	TOML   *LoadConfigsOptionsTOML
+	RunEnv string
 }
 
 type (
@@ -91,6 +92,7 @@ func New(options *NewOptions) (*Config, error) {
 				StringToJSON: file.TOMLStringToJSON,
 				ReaderToJSON: file.TOMLReaderToJSON,
 			},
+			RunEnv: envRun,
 		})
 		if err != nil {
 			return nil, err

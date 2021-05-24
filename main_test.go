@@ -57,11 +57,21 @@ var _ = Describe("pkg validation", func() {
 
 		When("option LoadConfigs", func() {
 			It("allows user overrides and keeps what is not overriden", func() {
+				keyEnvTarget := "RUN_ENV_CUSTOM"
+				keyEnvTargetValue := "staging"
+				err := os.Setenv(keyEnvTarget, keyEnvTargetValue)
+				defer os.Unsetenv(keyEnvTarget)
+				if err != nil {
+					panic(err)
+				}
+
 				var result TestValidateStructOne
-				_, err := config.New(&config.NewOptions{
+				_, err = config.New(&config.NewOptions{
 					ConfigUnmarshal: &result,
-					EnvKeyRunEnv:    "RUN_ENV",
+					EnvKeyRunEnv:    keyEnvTarget,
 					LoadConfigs: func(options *config.LoadConfigsOptions) ([][]byte, error) {
+						Expect(options.RunEnv).To(Equal(keyEnvTargetValue))
+
 						b1, err := options.TOML.BytesToJSON([]byte("RunEnv = 'overriden'"))
 						if err != nil {
 							return nil, err
@@ -152,10 +162,13 @@ var _ = Describe("pkg validation", func() {
 					var result TestValidateStructTwo
 					keyEnvTarget := "RUN_ENV_CUSTOM"
 					keyEnvTargetValue := "staging"
-					os.Setenv(keyEnvTarget, keyEnvTargetValue)
+					err := os.Setenv(keyEnvTarget, keyEnvTargetValue)
+					if err != nil {
+						panic(err)
+					}
 					defer os.Unsetenv(keyEnvTarget)
 
-					_, err := config.New(&config.NewOptions{
+					_, err = config.New(&config.NewOptions{
 						ConfigUnmarshal: &result,
 						EnvKeyRunEnv:    keyEnvTarget,
 						PathConfigs:     path.Join(pathFixtures, "configs-env"),

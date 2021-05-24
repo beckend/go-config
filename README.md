@@ -94,11 +94,18 @@ type TestValidateStructOne struct {
 	Password  string `validate:"required"`
 }
 
+err := os.Setenv("RUN_ENV", "staging")
+if err !=nil {
+  panic(err)
+}
+
 var result TestValidateStructOne
 _, err := config.New(&config.NewOptions{
   ConfigUnmarshal: &result,
   EnvKeyRunEnv:    "RUN_ENV",
   LoadConfigs: func(options *config.LoadConfigsOptions) ([][]byte, error) {
+    Expect(options.RunEnv).To(Equal("staging"))
+
     b1, err := options.TOML.BytesToJSON([]byte("RunEnv = 'overriden'"))
     if err != nil {
       return nil, err
