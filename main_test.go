@@ -41,7 +41,7 @@ var _ = Describe("pkg validation", func() {
 
 	Context("New", func() {
 		When("mapstructure annotations are present", func() {
-			It("allows for modifications before validating the struct", func() {
+			It("renames field test", func() {
 				var result TestMapstructure
 				_, err := config.New(&config.NewOptions{
 					ConfigUnmarshal: &result,

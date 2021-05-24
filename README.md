@@ -6,6 +6,47 @@
 go get -u github.com/beckend/go-config
 ```
 
+---
+
+### option LoadConfigs allows loading from custom sources
+
+See test for details, the gist is
+
+```golang
+				var result TestValidateStructOne
+				_, err := config.New(&config.NewOptions{
+					ConfigUnmarshal: &result,
+					EnvKeyRunEnv:    "RUN_ENV",
+					LoadConfigs: func(options *config.LoadConfigsOptions) ([][]byte, error) {
+						b1, err := options.TOML.BytesToJSON([]byte("RunEnv = 'overriden'"))
+						if err != nil {
+							return nil, err
+						}
+
+						b2, err := options.TOML.StringToJSON("AccessKey = 'overriden'")
+						if err != nil {
+							return nil, err
+						}
+
+						b3, err := options.TOML.ReaderToJSON(strings.NewReader("Shell = 'overriden'"))
+						if err != nil {
+							return nil, err
+						}
+
+						return [][]byte{b1, b2, b3}, nil
+					},
+					PathConfigs: path.Join(pathFixtures, "configs-base"),
+				})
+				if err != nil {
+					panic(err)
+				}
+
+				Expect(result.RunEnV).To(Equal("overriden"))
+				Expect(result.AccessKey).To(Equal("overriden"))
+				Expect(result.Shell).To(Equal("overriden"))
+				Expect(result.Password).To(Equal("defaultpassword"))
+```
+
 ### Description and usage
 
 - a directory with config files
@@ -66,4 +107,105 @@ func main() {
   // nobody if USERNAME is unset, otherwise the value of existing environment variable
   fmt.Println(myConfig.UserName)
 }
+```
+
+---
+
+### option LoadConfigs allows loading from custom sources
+
+Returning an array of json marshalled bytes, the order matter where the later one will override the previous.
+See `main_test.go` for details, the gist is
+
+`base.toml`
+
+```toml
+RunEnv = 'development'
+AccessKey = "AccessKey"
+Password = "${____password___|defaultpassword}"
+Shell = "${SHELL}"
+```
+
+```golang
+type TestValidateStructOne struct {
+	AccessKey string `validate:"required"`
+	RunEnV    string `validate:"required"`
+	Shell     string `validate:"required"`
+	Password  string `validate:"required"`
+}
+
+var result TestValidateStructOne
+_, err := config.New(&config.NewOptions{
+  ConfigUnmarshal: &result,
+  EnvKeyRunEnv:    "RUN_ENV",
+  LoadConfigs: func(options *config.LoadConfigsOptions) ([][]byte, error) {
+    b1, err := options.TOML.BytesToJSON([]byte("RunEnv = 'overriden'"))
+    if err != nil {
+      return nil, err
+    }
+
+    b2, err := options.TOML.StringToJSON("AccessKey = 'overriden'")
+    if err != nil {
+      return nil, err
+    }
+
+    b3, err := options.TOML.ReaderToJSON(strings.NewReader("Shell = 'overriden'"))
+    if err != nil {
+      return nil, err
+    }
+
+    return [][]byte{b1, b2, b3}, nil
+  },
+  PathConfigs: path.Join(pathFixtures, "configs-base"),
+})
+if err != nil {
+  panic(err)
+}
+
+Expect(result.RunEnV).To(Equal("overriden"))
+Expect(result.AccessKey).To(Equal("overriden"))
+Expect(result.Shell).To(Equal("overriden"))
+Expect(result.Password).To(Equal("defaultpassword"))
+```
+
+---
+
+### option OnConfigBeforeValidation allows modifications before struct is going to be validated to do custom logic before validation
+
+Good place to add complex logic to read/replace variables, at this stage all env variables have been replaced
+
+`base.toml`
+
+```toml
+RunEnv = 'development'
+AccessKey = "AccessKey"
+Password = "${____password___|defaultpassword}"
+Shell = "${SHELL}"
+```
+
+```golang
+type TestValidateStructOne struct {
+	AccessKey string `validate:"required"`
+	RunEnV    string `validate:"required"`
+	Shell     string `validate:"required"`
+	Password  string `validate:"required"`
+}
+
+var result TestValidateStructOne
+_, err := config.New(&config.NewOptions{
+  ConfigUnmarshal: &result,
+  EnvKeyRunEnv:    "RUN_ENV",
+  OnConfigBeforeValidation: func(options *config.OnConfigBeforeValidationOptions) error {
+    myConfig := options.ConfigUnmarshal.(*TestValidateStructOne)
+    myConfig.Password = "nope"
+    // /bin/*** depends on your environment
+    fmt.Println(myConfig.Shell)
+    return nil
+  },
+  PathConfigs: path.Join(pathFixtures, "configs-base"),
+})
+if err != nil {
+  panic(err)
+}
+
+Expect(result.Password).To(Equal("nope"))
 ```
