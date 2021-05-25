@@ -1,7 +1,8 @@
 package config_test
 
 import (
-	"errors"
+	errors "errors"
+	fs "io/fs"
 	os "os"
 	path "path"
 	filepath "path/filepath"
@@ -9,6 +10,7 @@ import (
 	strings "strings"
 
 	config "github.com/beckend/go-config"
+	common "github.com/beckend/go-config/pkg/common"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -35,7 +37,7 @@ type TestValidateStructOneFail struct {
 	RunEnV     string `validate:"required"`
 }
 
-var _ = Describe("pkg validation", func() {
+var _ = Describe("pkg main", func() {
 	_, pathCurrentFile, _, _ := runtime.Caller(0)
 	pathDirCurrent, _ := filepath.Split(pathCurrentFile)
 	pathFixtures := path.Join(pathDirCurrent, "tests/fixtures")
@@ -186,9 +188,7 @@ var _ = Describe("pkg validation", func() {
 					keyEnvTarget := "RUN_ENV_CUSTOM"
 					keyEnvTargetValue := "staging"
 					err := os.Setenv(keyEnvTarget, keyEnvTargetValue)
-					if err != nil {
-						panic(err)
-					}
+					common.FailOnError(err)
 					defer os.Unsetenv(keyEnvTarget)
 
 					_, err = config.New(&config.NewOptions{
@@ -196,9 +196,7 @@ var _ = Describe("pkg validation", func() {
 						EnvKeyRunEnv:    keyEnvTarget,
 						PathConfigs:     path.Join(pathFixtures, "configs-env"),
 					})
-					if err != nil {
-						panic(err)
-					}
+					common.FailOnError(err)
 
 					Expect(result.RunEnV).To(Equal(keyEnvTargetValue))
 				})
@@ -211,11 +209,30 @@ var _ = Describe("pkg validation", func() {
 						ConfigUnmarshal: &result,
 						PathConfigs:     path.Join(pathFixtures, "configs-local"),
 					})
-					if err != nil {
-						panic(err)
-					}
+					common.FailOnError(err)
 
 					Expect(result.RunEnV).To(Equal("local-overwritten"))
+				})
+			})
+
+			When("configs-custom test1.toml", func() {
+				It("works", func() {
+					var result map[string]interface{}
+					_, err := config.New(&config.NewOptions{
+						ConfigUnmarshal: &result,
+						LoadConfigs: func(options *config.LoadConfigsOptions) ([][]byte, error) {
+							b1, err := options.TOML.FileReaderCallbackToJSON(func() (fs.File, error) {
+								return os.Open(path.Join(pathFixtures, "configs-custom/test1.toml"))
+							})
+							common.FailOnError(err)
+
+							return [][]byte{b1}, nil
+						},
+					})
+					common.FailOnError(err)
+
+					Expect(result["RunEnv"]).To(Equal("development"))
+					Expect(result["Shell"]).ToNot(Equal("${SHELL}"))
 				})
 			})
 		})

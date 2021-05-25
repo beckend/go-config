@@ -1,0 +1,457 @@
+{
+  "NameService": "something",
+  "RunEnv": "development",
+  "MessageBrokerTracking": {
+    "URI": "amqp://user:bitnami@localhost:5672/%2f",
+    "ExchangesQueues": {
+      "Tracking": {
+        "Queue": {
+          "Arguments": {
+            "message-ttl": 2592000000,
+            "x-max-length": 1000000000,
+            "x-max-length-bytes": 10737418240
+          }
+        }
+      },
+      "TrackingUploaded": {
+        "Exchange": {
+          "AutoDeleted": false,
+          "Durable": true,
+          "Internal": false,
+          "Name": "exchange2",
+          "NoWait": false,
+          "Type": "fanout"
+        },
+        "Queue": {
+          "AutoDeleted": false,
+          "BindExchangeNoWait": false,
+          "Durable": true,
+          "Exclusive": false,
+          "Name": "queue1",
+          "NoWait": false
+        }
+      }
+    }
+  },
+  "ObjectStorageTracking": {
+    "AccessKeyID": "SDKSABHGDZE324CBHSAVD",
+    "Region": "us-west-1",
+    "SecretAccessKey": "nFfdsafsadjodfhsSFDDSFSDf211"
+  },
+  "SVCCore": {
+    "URIStatsD": "unix:///statsd.socket"
+  },
+  "Tasks": {
+    "Tracking": {
+      "DatabaseAccountName": "account1",
+      "DatabaseKeyPrivate": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrl58zkHl767b9\noQqurP3lEvXcOGynlknbL5DfTPi6dD8j5LConKoBNeAv8/Z9FpPLXFPUJCezEqFw\nPGp1WHRoaLBmV+9DxCvni6iCSYV4BtyT8n93N9dUPhiDYtKCpaRoabetc4x2vjmY\nhqZpl7MDh7d94r6snGOjtn+kgNvNb3eEvZ3PAKm/vDlQ4Ekpcqhem79cvbiyXSwJ\nNxbtHwF12b0UhyY8c2+c5wU1eTqU7eRF8Z7kcrJr0e3lOHUhkF0OoH18mu17P8dK\nWr8PTfyagzZGLmzY/cQNcJSBU2Hu7Y5VeWHo/egP1VSa3+40vqNS3RV56C6J8CYF\nkJozuB91AgMBAAECggEAI/7mkraYBXrpJEOILiR0Dn3vvYbIpE9OpwBPb8iB1PtV\n033B4V0b/K0EnoqbBpqZ3ms72qDLAzHBU/4Yhw1LPivX9WA0/Q5F94jAjLRHn2ox\nE4gnXScFsNJl6gntByMgXhbvRR+cM7yr8Gcuua/tCayKvYm3XhZggJNkK2ossed8\nLt6a/6Jb5oi8o/HzRH4Wvo4kmtGMNQrE89GD/WN/ojCouUA7gw6GP0KUM3DbPXXf\nMgvnBLXgKV8kn9ENBOfPGxvQGjI0/+sGtn/5Qd5bxcK81AS+le8Ap3Er4iKNa0dD\n8M3eRxCuOWPuVFetu+myEqST8mkKdne00Hrb+7QdgQKBgQDbsohZl2EM52JV0MAS\nDF8hHXbdhRfuJBJXLyQYTNDFRwk0IZxU5ocrKFdjWFuKucu6BIhK3mJhVEJTakRk\n9O3/9zOTi6nJRfZdnyjYjnsWNSSZFXUZ9egdToIzK9CM3JvWO1k7BvA1t+aUg7Qo\nqCBfbHvpm2WKShQ5DgKMoqNqKQKBgQDH8i8fwMwDd4K4ldOpLUnXT/Mkj84t8XLw\n4kvBMpnRHlkodQWxLAZ2GkWH+vbUwba/X4UEKng0gR36lV0k2CeKP6qs5tf7IM2l\nhmysJfYGkhZkKLmSvnvLa7L0c7S+ni/E6XRCzAaYwc7gaUn5LIuIayJocXKvlIGq\nOe0CyxoMbQKBgGyv6DCaaVLe7ZES0tKa+D0DvJhejbYsdj5Xff3fkrDmMbFup06B\nNYGuVX06ax84R4dhUqPnXLhV3PIzcl6XpV6qRwPJZlfCmt06LhTkeBRGejKZoPMU\n6p4FBviVxnjJcvcLKVvAVPneXt4+QdSTSGCs5KhvTk6Z02NegPheRYXxAoGBAIdw\nJL2kkk1y4eh5DQQW+mLP9Ep64tW6LPrAv0HiLdE6dnhyNGXcBZBwoVLIC/T4NvsR\nEABPaFdgctcv4AU6KiZ6k/lE8V5ZzRNnqCtAF5RB1ssHzxR41VBo5rKxwegxLPh8\njtVEcN9+wMzAZWxU4TuKHqeS2XXX6bFORZ7TxxRNAoGAew8xtwojZGvjVAI2uJrd\nlGVi2I4/xpEphPfkppZBEYvX7wd+xCBbgcoUsbfQW6ZhZhQ8epBKvILL4Wvb2fQ2\nctDZjSMfxtEF/8up9koOtUiwlsYPyjX4VPOEEzZguLNDFV+lUxztS2Zs0X72fI6m\n67mOhJMBvgyu9f8bm/y94r8=\n-----END PRIVATE KEY-----\n",
+      "DatabaseType": "dbtype1",
+      "DatabaseUserName": "username1",
+      "LimitBuffer": 100000,
+      "ObjectStoreNameBucket": "bucket1",
+      "TimeoutBufferSeconds": 300
+    }
+  },
+  "Generated": [
+    {
+      "_id": "60acfab4c16510685aa235c7",
+      "index": 0,
+      "guid": "7d00d61c-3ab5-4c67-815d-1675dc60d738",
+      "isActive": false,
+      "balance": "$1,124.81",
+      "picture": "http://placehold.it/32x32",
+      "age": 31,
+      "eyeColor": "brown",
+      "name": {
+        "first": "Brenda",
+        "last": "Chandler"
+      },
+      "company": "ENTROFLEX",
+      "email": "brenda.chandler@entroflex.us",
+      "phone": "+1 (915) 445-3535",
+      "address": "132 Albee Square, Olney, American Samoa, 5479",
+      "about": "Minim tempor voluptate veniam sunt reprehenderit laborum minim aute commodo enim labore eiusmod incididunt ut. Magna quis exercitation dolore velit est Lorem aliqua do in et ea dolor. Tempor exercitation Lorem consectetur laboris labore sint laboris. Veniam dolore tempor culpa eiusmod. Occaecat labore nostrud sint velit quis.",
+      "registered": "Thursday, July 30, 2015 2:08 AM",
+      "latitude": "-86.278219",
+      "longitude": "158.513526",
+      "tags": ["commodo", "sint", "nulla", "ex", "esse"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Vicki Harper"
+        },
+        {
+          "id": 1,
+          "name": "Adela Clemons"
+        },
+        {
+          "id": 2,
+          "name": "Tammie Ayala"
+        }
+      ],
+      "greeting": "Hello, Brenda! You have 10 unread messages.",
+      "favoriteFruit": "strawberry"
+    },
+    {
+      "_id": "60acfab4fffb5ba073452f3e",
+      "index": 1,
+      "guid": "09a14e69-c4a4-4483-877e-05b840602544",
+      "isActive": true,
+      "balance": "$1,665.37",
+      "picture": "http://placehold.it/32x32",
+      "age": 32,
+      "eyeColor": "brown",
+      "name": {
+        "first": "Goff",
+        "last": "Gibbs"
+      },
+      "company": "COMTREK",
+      "email": "goff.gibbs@comtrek.name",
+      "phone": "+1 (874) 534-2590",
+      "address": "732 Baughman Place, Haring, South Dakota, 7026",
+      "about": "Voluptate irure nisi excepteur Lorem labore sint ullamco ut consequat adipisicing anim quis elit. Anim incididunt sint officia dolor ad id nisi duis consectetur incididunt qui sit mollit. Ipsum minim do aliquip eu dolore anim. Consequat voluptate cillum id tempor minim nulla eu incididunt sint. Id amet velit consectetur enim officia ad est voluptate. Sint Lorem minim enim voluptate sunt incididunt irure exercitation veniam amet. Sit laboris exercitation id qui mollit Lorem commodo mollit aliquip.",
+      "registered": "Thursday, September 12, 2019 6:08 PM",
+      "latitude": "69.56532",
+      "longitude": "31.574856",
+      "tags": ["in", "nostrud", "id", "sunt", "pariatur"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Leanne Bray"
+        },
+        {
+          "id": 1,
+          "name": "Browning Barlow"
+        },
+        {
+          "id": 2,
+          "name": "Pansy Ross"
+        }
+      ],
+      "greeting": "Hello, Goff! You have 6 unread messages.",
+      "favoriteFruit": "banana"
+    },
+    {
+      "_id": "60acfab42f5b45db8711090e",
+      "index": 2,
+      "guid": "ae27f6a5-7711-48be-a3a1-ab58f7e8a1ac",
+      "isActive": false,
+      "balance": "$1,682.60",
+      "picture": "http://placehold.it/32x32",
+      "age": 37,
+      "eyeColor": "blue",
+      "name": {
+        "first": "Jody",
+        "last": "Casey"
+      },
+      "company": "GINKOGENE",
+      "email": "jody.casey@ginkogene.info",
+      "phone": "+1 (911) 427-3418",
+      "address": "498 Joval Court, Vernon, Illinois, 958",
+      "about": "Enim eu velit non culpa nostrud ipsum dolor fugiat. Officia aute velit cillum adipisicing ex fugiat. Non velit nostrud eu anim in officia. Dolor esse non magna id dolor nostrud sit ullamco. Cupidatat fugiat aliquip excepteur elit elit in enim dolore nostrud do Lorem.",
+      "registered": "Wednesday, January 9, 2019 4:44 AM",
+      "latitude": "-15.195318",
+      "longitude": "55.10896",
+      "tags": ["laborum", "fugiat", "proident", "sit", "nostrud"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Francis Mcfarland"
+        },
+        {
+          "id": 1,
+          "name": "Fields Finch"
+        },
+        {
+          "id": 2,
+          "name": "Pamela Gay"
+        }
+      ],
+      "greeting": "Hello, Jody! You have 9 unread messages.",
+      "favoriteFruit": "banana"
+    },
+    {
+      "_id": "60acfab4f325596b18f325d1",
+      "index": 3,
+      "guid": "fd6bc01a-f696-4c59-bd49-fa4bb0e5a3bd",
+      "isActive": true,
+      "balance": "$1,196.07",
+      "picture": "http://placehold.it/32x32",
+      "age": 33,
+      "eyeColor": "blue",
+      "name": {
+        "first": "Gordon",
+        "last": "Tate"
+      },
+      "company": "PERKLE",
+      "email": "gordon.tate@perkle.co.uk",
+      "phone": "+1 (908) 521-3836",
+      "address": "627 Russell Street, Baker, Virginia, 2019",
+      "about": "Id sint non ad consequat aute adipisicing irure id ad culpa in nulla qui. Cillum aliquip quis ad voluptate pariatur dolor quis adipisicing velit pariatur. Eiusmod ut ullamco nostrud occaecat mollit do dolore pariatur cupidatat. Non cillum occaecat sit aliqua aliquip culpa mollit. Fugiat do culpa ad adipisicing nisi dolor reprehenderit laboris eiusmod et exercitation occaecat dolore cupidatat. Exercitation eiusmod pariatur nisi consequat occaecat ullamco laborum laboris. Laboris eu sint nostrud tempor.",
+      "registered": "Monday, March 23, 2020 1:45 PM",
+      "latitude": "14.351715",
+      "longitude": "-121.973664",
+      "tags": ["et", "amet", "tempor", "magna", "voluptate"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Imogene Peterson"
+        },
+        {
+          "id": 1,
+          "name": "Mcmillan Hood"
+        },
+        {
+          "id": 2,
+          "name": "Guzman Reilly"
+        }
+      ],
+      "greeting": "Hello, Gordon! You have 6 unread messages.",
+      "favoriteFruit": "apple"
+    },
+    {
+      "_id": "60acfab44c01548926c106df",
+      "index": 4,
+      "guid": "846351b7-e4ad-49e2-9308-dde52c512ac6",
+      "isActive": false,
+      "balance": "$3,152.40",
+      "picture": "http://placehold.it/32x32",
+      "age": 37,
+      "eyeColor": "green",
+      "name": {
+        "first": "Aimee",
+        "last": "Whitney"
+      },
+      "company": "QIAO",
+      "email": "aimee.whitney@qiao.net",
+      "phone": "+1 (805) 482-3138",
+      "address": "348 Emerson Place, Bawcomville, Wisconsin, 1776",
+      "about": "Incididunt laboris elit sunt in sint occaecat duis enim esse officia. Deserunt proident deserunt amet aliquip esse veniam ipsum fugiat cillum mollit eiusmod consequat irure. In esse adipisicing exercitation ut id et aliqua velit laborum laboris reprehenderit. Laboris laborum aliquip laboris anim velit voluptate mollit. Commodo qui deserunt sunt ipsum officia occaecat aute. Elit ut officia reprehenderit officia nulla qui.",
+      "registered": "Thursday, March 24, 2016 9:44 PM",
+      "latitude": "-23.283493",
+      "longitude": "-38.155644",
+      "tags": ["proident", "excepteur", "dolore", "sit", "ullamco"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Chelsea Rios"
+        },
+        {
+          "id": 1,
+          "name": "April Harrison"
+        },
+        {
+          "id": 2,
+          "name": "Goldie Rodriguez"
+        }
+      ],
+      "greeting": "Hello, Aimee! You have 6 unread messages.",
+      "favoriteFruit": "banana"
+    },
+    {
+      "_id": "60acfab460e6d810a7239a2b",
+      "index": 5,
+      "guid": "f5ab7995-0e44-491e-b5cb-38c69304fce8",
+      "isActive": false,
+      "balance": "$3,425.87",
+      "picture": "http://placehold.it/32x32",
+      "age": 38,
+      "eyeColor": "brown",
+      "name": {
+        "first": "Millie",
+        "last": "Morales"
+      },
+      "company": "ZENTHALL",
+      "email": "millie.morales@zenthall.ca",
+      "phone": "+1 (925) 484-3024",
+      "address": "333 Nostrand Avenue, Moraida, Kentucky, 3706",
+      "about": "Consectetur consectetur quis non velit. Do eu non voluptate minim. Anim ut aliquip qui culpa culpa Lorem ipsum ut esse nisi nostrud. Consequat mollit eiusmod laboris est ad labore elit. Ut ipsum dolore laborum ea. Labore magna adipisicing magna Lorem qui Lorem ipsum consectetur voluptate.",
+      "registered": "Wednesday, June 13, 2018 5:54 PM",
+      "latitude": "49.83977",
+      "longitude": "82.103762",
+      "tags": ["laboris", "ad", "reprehenderit", "veniam", "sunt"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Heidi Roth"
+        },
+        {
+          "id": 1,
+          "name": "Conner Shelton"
+        },
+        {
+          "id": 2,
+          "name": "Blanca Callahan"
+        }
+      ],
+      "greeting": "Hello, Millie! You have 9 unread messages.",
+      "favoriteFruit": "banana"
+    },
+    {
+      "_id": "60acfab4c52c0bc5e2236108",
+      "index": 6,
+      "guid": "47b215fe-3b65-4782-9a7b-572942c5ad9f",
+      "isActive": false,
+      "balance": "$1,675.07",
+      "picture": "http://placehold.it/32x32",
+      "age": 31,
+      "eyeColor": "blue",
+      "name": {
+        "first": "Sandra",
+        "last": "Pugh"
+      },
+      "company": "VURBO",
+      "email": "sandra.pugh@vurbo.me",
+      "phone": "+1 (883) 505-2613",
+      "address": "535 Moore Place, Grayhawk, Federated States Of Micronesia, 4977",
+      "about": "Excepteur sit esse veniam Lorem Lorem consequat enim sit elit esse ad ex. Do dolor amet exercitation elit cillum cupidatat esse fugiat ea dolore reprehenderit non cupidatat. Ad elit culpa do sunt laboris ipsum commodo ipsum magna sit aliqua. Culpa elit anim nisi minim fugiat.",
+      "registered": "Tuesday, July 25, 2017 11:52 PM",
+      "latitude": "-2.752173",
+      "longitude": "-61.843256",
+      "tags": ["fugiat", "id", "sunt", "quis", "cillum"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Castaneda Sutton"
+        },
+        {
+          "id": 1,
+          "name": "Mariana Morrison"
+        },
+        {
+          "id": 2,
+          "name": "Jane Cooley"
+        }
+      ],
+      "greeting": "Hello, Sandra! You have 5 unread messages.",
+      "favoriteFruit": "banana"
+    },
+    {
+      "_id": "60acfab426bdb30d0335d093",
+      "index": 7,
+      "guid": "f7a632ee-4df7-415e-adf0-8ecac206dcf3",
+      "isActive": false,
+      "balance": "$3,972.49",
+      "picture": "http://placehold.it/32x32",
+      "age": 36,
+      "eyeColor": "blue",
+      "name": {
+        "first": "Gaines",
+        "last": "Hutchinson"
+      },
+      "company": "ISOPLEX",
+      "email": "gaines.hutchinson@isoplex.tv",
+      "phone": "+1 (842) 441-2359",
+      "address": "718 Williams Place, Ebro, Arizona, 5542",
+      "about": "Exercitation incididunt ex esse in sunt cillum cillum incididunt sit. Magna est eu occaecat anim sunt. Voluptate ut dolore est amet amet magna dolor minim aliquip quis adipisicing excepteur enim. Dolore id ad duis qui eiusmod nulla sint minim deserunt magna Lorem.",
+      "registered": "Wednesday, September 30, 2020 10:22 PM",
+      "latitude": "-29.301334",
+      "longitude": "-30.512209",
+      "tags": ["labore", "in", "nisi", "quis", "ad"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Bessie Duncan"
+        },
+        {
+          "id": 1,
+          "name": "Janis Travis"
+        },
+        {
+          "id": 2,
+          "name": "Eloise Morgan"
+        }
+      ],
+      "greeting": "Hello, Gaines! You have 9 unread messages.",
+      "favoriteFruit": "banana"
+    },
+    {
+      "_id": "60acfab47ffc4a2cd62c8f53",
+      "index": 8,
+      "guid": "684b65d3-6395-4da4-a24f-c6cae6b6972d",
+      "isActive": true,
+      "balance": "$1,956.98",
+      "picture": "http://placehold.it/32x32",
+      "age": 38,
+      "eyeColor": "green",
+      "name": {
+        "first": "Lynnette",
+        "last": "Rasmussen"
+      },
+      "company": "ZIALACTIC",
+      "email": "lynnette.rasmussen@zialactic.biz",
+      "phone": "+1 (885) 403-3400",
+      "address": "312 Hancock Street, Cucumber, Delaware, 3602",
+      "about": "Anim proident et deserunt ullamco amet voluptate tempor. Duis eiusmod ad aliqua et reprehenderit amet minim ipsum reprehenderit quis consequat consectetur enim. Ex nisi sunt esse reprehenderit fugiat pariatur aute consectetur in voluptate. Ut consectetur commodo id et elit cillum tempor ullamco nostrud. Aliqua ipsum amet exercitation minim laborum consectetur consequat. Sint aliquip irure sit adipisicing nisi mollit aliqua ad non labore anim adipisicing nostrud laboris. Ipsum qui officia mollit id esse elit velit nostrud occaecat sunt elit esse.",
+      "registered": "Thursday, December 13, 2018 4:01 PM",
+      "latitude": "-49.805397",
+      "longitude": "39.229005",
+      "tags": ["adipisicing", "duis", "do", "veniam", "voluptate"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Joyce Marks"
+        },
+        {
+          "id": 1,
+          "name": "Mays Gross"
+        },
+        {
+          "id": 2,
+          "name": "Clark Lyons"
+        }
+      ],
+      "greeting": "Hello, Lynnette! You have 9 unread messages.",
+      "favoriteFruit": "apple"
+    },
+    {
+      "_id": "60acfab4c3eddd0c3b2bdd52",
+      "index": 9,
+      "guid": "35c796cf-981e-4422-ba6d-105d54f0795c",
+      "isActive": true,
+      "balance": "$3,631.19",
+      "picture": "http://placehold.it/32x32",
+      "age": 27,
+      "eyeColor": "blue",
+      "name": {
+        "first": "Lancaster",
+        "last": "Dotson"
+      },
+      "company": "SINGAVERA",
+      "email": "lancaster.dotson@singavera.com",
+      "phone": "+1 (965) 459-2851",
+      "address": "242 Rutherford Place, Imperial, West Virginia, 5043",
+      "about": "Voluptate duis commodo ad tempor culpa. Ipsum sint cupidatat enim dolore mollit cupidatat duis nulla cillum duis do. Non aute dolor eu officia aute anim dolore qui magna.",
+      "registered": "Tuesday, May 23, 2017 10:41 AM",
+      "latitude": "66.417677",
+      "longitude": "-121.881779",
+      "tags": ["ex", "exercitation", "reprehenderit", "duis", "enim"],
+      "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "friends": [
+        {
+          "id": 0,
+          "name": "Alissa Monroe"
+        },
+        {
+          "id": 1,
+          "name": "Leblanc Hodge"
+        },
+        {
+          "id": 2,
+          "name": "Boyd Sampson"
+        }
+      ],
+      "greeting": "Hello, Lancaster! You have 10 unread messages.",
+      "favoriteFruit": "banana"
+    }
+  ]
+}

@@ -11,13 +11,14 @@ import (
 
 	environment "github.com/beckend/go-config/pkg/environment"
 	file "github.com/beckend/go-config/pkg/file"
+	"github.com/beckend/go-config/pkg/reflection"
 	singletons "github.com/beckend/go-config/pkg/singletons"
 	validation "github.com/beckend/go-config/pkg/validation"
 	walkertype "github.com/beckend/go-config/pkg/walker-type"
 	validator "github.com/go-playground/validator/v10"
+
 	envutil "github.com/gookit/goutil/envutil"
 	jsoniter "github.com/json-iterator/go"
-
 	conditional "github.com/mileusna/conditional"
 	mapstructure "github.com/mitchellh/mapstructure"
 )
@@ -67,18 +68,21 @@ func New(options *NewOptions) (*Config, error) {
 	_, envKeyUserExists := os.LookupEnv(options.EnvKeyRunEnv)
 	envRun := environment.GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), "")
 	var filesToBeMerged []string
-	var filesToLoad []string
 
-	// the order to load is base, env specific, then local, where the next overrides the previous values
-	filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, "base.toml"))
-	if envRun != "" {
-		filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, envRun+".toml"))
-	}
-	filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, "local.toml"))
+	if options.PathConfigs != "" {
+		var filesToLoad []string
 
-	for _, pathFile := range filesToLoad {
-		if _, err := os.Stat(pathFile); err == nil {
-			filesToBeMerged = append(filesToBeMerged, pathFile)
+		// the order to load is base, env specific, then local, where the next overrides the previous values
+		filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, "base.toml"))
+		if envRun != "" {
+			filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, envRun+".toml"))
+		}
+		filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, "local.toml"))
+
+		for _, pathFile := range filesToLoad {
+			if _, err := os.Stat(pathFile); err == nil {
+				filesToBeMerged = append(filesToBeMerged, pathFile)
+			}
 		}
 	}
 
@@ -112,27 +116,33 @@ func New(options *NewOptions) (*Config, error) {
 	}
 
 	// convert to a generic map interface to replace env variables
-	var configMap walkertype.TypeMap
+	var configMap map[string]interface{}
 	err = json.Unmarshal(bytesJSONMerged, &configMap)
 	if err != nil {
 		return nil, err
 	}
 
-	(&walkertype.Walker{}).WalkMap(configMap, func(options *walkertype.WalkerOnWalkMapOptions) *walkertype.WalkerReturn {
-		if options.Kind == reflect.String {
-			options.Document[options.Key] = envutil.ParseEnvValue(options.Value.(string))
+	configMapped := walkertype.Walk(&walkertype.WalkOptions{
+		Object: configMap,
+		OnKind: func(oosvo *walkertype.OnKindOptions) *walkertype.OnKindWalkReturn {
+			if oosvo.CaseKind == reflect.String {
+				oosvo.Copy.SetString(envutil.ParseEnvValue(oosvo.Original.String()))
 
-			return &walkertype.WalkerReturn{
-				Handled: true,
+				return &walkertype.OnKindWalkReturn{
+					Handled: true,
+				}
 			}
-		}
 
-		return &walkertype.WalkerReturn{
-			Handled: false,
-		}
+			return &walkertype.OnKindWalkReturn{
+				Handled: false,
+			}
+		},
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	mapstructure.Decode(configMap, &options.ConfigUnmarshal)
+	mapstructure.Decode(configMapped, &options.ConfigUnmarshal)
 
 	if options.OnConfigBeforeValidation != nil {
 		err = options.OnConfigBeforeValidation(&OnConfigBeforeValidationOptions{
@@ -144,19 +154,26 @@ func New(options *NewOptions) (*Config, error) {
 		}
 	}
 
-	errsValidation := singletons.New().Validation.ValidateStruct(validation.ValidatorUtilsValidateStructOptions{
-		PrefixError:  "Config struct validation error - ",
-		TheStruct:    options.ConfigUnmarshal,
-		PanicOnError: false,
-	})
+	// validator cannot handlle unamed types such as "var result map[string]interface{}", it needs a struct
+	if !reflection.HasElement([]string{"*", ""}, reflection.GetType(options.ConfigUnmarshal)) {
+		errsValidation := singletons.New().Validation.ValidateStruct(validation.ValidatorUtilsValidateStructOptions{
+			PrefixError:  "Config struct validation error - ",
+			TheStruct:    options.ConfigUnmarshal,
+			PanicOnError: false,
+		})
 
-	if errsValidation != nil && len(*errsValidation) > 0 {
-		err = errors.New("config struct validation failed")
-	} else {
-		err = nil
+		if errsValidation != nil && len(*errsValidation) > 0 {
+			err = errors.New("config struct validation failed")
+		} else {
+			err = nil
+		}
+
+		return &Config{
+			ErrorsValidation: errsValidation,
+		}, err
 	}
 
 	return &Config{
-		ErrorsValidation: errsValidation,
+		ErrorsValidation: nil,
 	}, err
 }

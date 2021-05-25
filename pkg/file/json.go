@@ -4,6 +4,8 @@ import (
 	bytes "bytes"
 	jsonOriginal "encoding/json"
 	fmt "fmt"
+	io "io"
+	os "os"
 	time "time"
 
 	jsonpatch "github.com/evanphx/json-patch"
@@ -121,4 +123,30 @@ func JSONGenericMapToBytes(input map[string]interface{}) ([]byte, error) {
 	}
 
 	return returned, nil
+}
+
+func JSONFileToBytes(pathFile string) ([]byte, error) {
+	fileJson, err := os.Open(pathFile)
+	if err != nil {
+		return nil, err
+	}
+	defer fileJson.Close()
+
+	returned, err := io.ReadAll(fileJson)
+	if err != nil {
+		return nil, err
+	}
+
+	return returned, nil
+}
+
+func JSONFileToMap(pathFile string) (map[string]interface{}, error) {
+	bytes, err := JSONFileToBytes(pathFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var result map[string]interface{}
+	json.Unmarshal(bytes, &result)
+	return result, nil
 }
