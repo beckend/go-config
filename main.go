@@ -43,8 +43,10 @@ type LoadConfigsOptionsTOML struct {
 }
 
 type LoadConfigsOptions struct {
-	TOML   *LoadConfigsOptionsTOML
-	RunEnv string
+	FilesLoaded           []string
+	ConfigJSONMergedBytes []byte
+	RunEnv                string
+	TOML                  *LoadConfigsOptionsTOML
 }
 
 type (
@@ -65,13 +67,14 @@ type NewOptions struct {
 
 // New read configurations with priority, the later overrides the previous
 func New(options *NewOptions) (*Config, error) {
-	_, envKeyUserExists := os.LookupEnv(options.EnvKeyRunEnv)
-	envRun := environment.GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), "")
-	var filesToBeMerged []string
+	var (
+		_, envKeyUserExists = os.LookupEnv(options.EnvKeyRunEnv)
+		envRun              = environment.GetEnv(conditional.String(envKeyUserExists, options.EnvKeyRunEnv, "RUN_ENV"), "")
+		filesToBeMerged     []string
+		filesToLoad         []string
+	)
 
 	if options.PathConfigs != "" {
-		var filesToLoad []string
-
 		// the order to load is base, env specific, then local, where the next overrides the previous values
 		filesToLoad = append(filesToLoad, path.Join(options.PathConfigs, "base.toml"))
 		if envRun != "" {
@@ -93,6 +96,9 @@ func New(options *NewOptions) (*Config, error) {
 
 	if options.LoadConfigs != nil {
 		byteSlicesUser, err := options.LoadConfigs(&LoadConfigsOptions{
+			FilesLoaded:           filesToLoad,
+			ConfigJSONMergedBytes: bytesJSONMerged,
+			RunEnv:                envRun,
 			TOML: &LoadConfigsOptionsTOML{
 				FileToJSON:               file.TOMLFileToJSON,
 				BytesToJSON:              file.TOMLBytesToJSON,
@@ -101,7 +107,6 @@ func New(options *NewOptions) (*Config, error) {
 				FileReaderToJSON:         file.TOMLFileReaderToJSON,
 				FileReaderCallbackToJSON: file.TOMLFileReaderCallbackToJSON,
 			},
-			RunEnv: envRun,
 		})
 		if err != nil {
 			return nil, err

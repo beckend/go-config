@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/evanphx/json-patch v0.5.2
-	github.com/fatih/color v1.11.0
+	github.com/fatih/color v1.12.0
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/gookit/goutil v0.3.13
 	github.com/json-iterator/go v1.1.11

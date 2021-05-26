@@ -221,6 +221,9 @@ var _ = Describe("pkg main", func() {
 					_, err := config.New(&config.NewOptions{
 						ConfigUnmarshal: &result,
 						LoadConfigs: func(options *config.LoadConfigsOptions) ([][]byte, error) {
+							Expect(len(options.ConfigJSONMergedBytes) > 0).To(Equal(true))
+							Expect(len(options.FilesLoaded) > 0).To(Equal(true))
+
 							b1, err := options.TOML.FileReaderCallbackToJSON(func() (fs.File, error) {
 								return os.Open(path.Join(pathFixtures, "configs-custom/test1.toml"))
 							})
@@ -228,11 +231,12 @@ var _ = Describe("pkg main", func() {
 
 							return [][]byte{b1}, nil
 						},
+						PathConfigs: path.Join(pathFixtures, "configs-base"),
 					})
 					common.FailOnError(err)
 
 					Expect(result["RunEnv"]).To(Equal("development"))
-					Expect(result["Shell"]).ToNot(Equal("${SHELL}"))
+					Expect(result["Shell2"]).ToNot(Equal("${SHELL}"))
 				})
 			})
 		})

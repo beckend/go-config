@@ -1,6 +1,6 @@
 NameService = "something"
 RunEnv = "development"
-Shell = "${SHELL}"
+Shell2 = "${SHELL}"
 
 [MessageBrokerTracking]
 URI = "amqp://user:bitnami@localhost:5672/%2f"
