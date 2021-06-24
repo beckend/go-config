@@ -1,2 +1,3 @@
 ./configs/local.toml
 *.coverprofile
+.envrc.local.sh

@@ -37,6 +37,18 @@ type TestValidateStructOneFail struct {
 	RunEnV     string `validate:"required"`
 }
 
+type TestValidateStructMissingEnv struct {
+	RunEnV string `validate:"required"`
+	Ntest1 struct {
+		Nest2 struct {
+			Value1 string `validate:"required"`
+			Nest3  struct {
+				Value2 string `validate:"required"`
+			}
+		}
+	}
+}
+
 var _ = Describe("pkg main", func() {
 	_, pathCurrentFile, _, _ := runtime.Caller(0)
 	pathDirCurrent, _ := filepath.Split(pathCurrentFile)
@@ -212,6 +224,18 @@ var _ = Describe("pkg main", func() {
 					common.FailOnError(err)
 
 					Expect(result.RunEnV).To(Equal("local-overwritten"))
+				})
+			})
+
+			When("struct", func() {
+				It("local.toml has the last word.", func() {
+					var result TestValidateStructMissingEnv
+					_, err := config.New(&config.NewOptions{
+						ConfigUnmarshal: &result,
+						PathConfigs:     path.Join(pathFixtures, "configs-env-not-replaced"),
+					})
+
+					Expect(err.Error()).To(ContainSubstring("missing replacement"))
 				})
 			})
 

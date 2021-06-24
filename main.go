@@ -3,19 +3,22 @@ package config
 
 import (
 	errors "errors"
+	fmt "fmt"
 	io "io"
 	fs "io/fs"
 	os "os"
 	path "path"
 	reflect "reflect"
+	strings "strings"
 
 	environment "github.com/beckend/go-config/pkg/environment"
 	file "github.com/beckend/go-config/pkg/file"
-	"github.com/beckend/go-config/pkg/reflection"
+	reflection "github.com/beckend/go-config/pkg/reflection"
 	singletons "github.com/beckend/go-config/pkg/singletons"
 	validation "github.com/beckend/go-config/pkg/validation"
 	walkertype "github.com/beckend/go-config/pkg/walker-type"
 	validator "github.com/go-playground/validator/v10"
+	flatten "github.com/jeremywohl/flatten"
 
 	envutil "github.com/gookit/goutil/envutil"
 	jsoniter "github.com/json-iterator/go"
@@ -173,6 +176,10 @@ func New(options *NewOptions) (*Config, error) {
 			err = nil
 		}
 
+		if err == nil {
+			err = validateStructNoUnmappedEnvVariables(options.ConfigUnmarshal)
+		}
+
 		return &Config{
 			ErrorsValidation: errsValidation,
 		}, err
@@ -181,4 +188,28 @@ func New(options *NewOptions) (*Config, error) {
 	return &Config{
 		ErrorsValidation: nil,
 	}, err
+}
+
+func validateStructNoUnmappedEnvVariables(input interface{}) (err error) {
+	var interfaceMapped map[string]interface{}
+	inrec, err := json.Marshal(input)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(inrec, &interfaceMapped)
+	if err != nil {
+		return err
+	}
+
+	interfaceFlat, err := flatten.Flatten(interfaceMapped, "", flatten.DotStyle)
+
+	for key, value := range interfaceFlat {
+		valueString := fmt.Sprintf("%v", value)
+		if strings.HasPrefix(valueString, "${") && strings.HasSuffix(valueString, "}") {
+			fmt.Printf("key: %s - environment variable not replaced: %s\n", key, valueString)
+			err = errors.New("validation failed due to missing replacement(s) of environment variable")
+		}
+	}
+
+	return err
 }
